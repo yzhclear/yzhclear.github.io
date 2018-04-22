@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzhclear.com/"/>
-  <updated>2018-02-03T16:24:03.000Z</updated>
+  <updated>2018-04-22T16:34:09.000Z</updated>
   <id>http://yzhclear.com/</id>
   
   <author>
@@ -17,54 +17,27 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>my new post</title>
-    <link href="http://yzhclear.com/2018/02/03/my-new-post/"/>
-    <id>http://yzhclear.com/2018/02/03/my-new-post/</id>
-    <published>2018-02-03T15:56:44.000Z</published>
-    <updated>2018-02-03T16:24:03.000Z</updated>
+    <title>从Promise中看JavaScript事件循环</title>
+    <link href="http://yzhclear.com/2018/04/22/%E4%BB%8EPromise%E4%B8%AD%E7%9C%8BJavaScript%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/"/>
+    <id>http://yzhclear.com/2018/04/22/从Promise中看JavaScript事件循环/</id>
+    <published>2018-04-22T06:57:15.000Z</published>
+    <updated>2018-04-22T16:34:09.000Z</updated>
     
-    <content type="html"><![CDATA[<p>测试测试测试测试测试测试测试测试测试测试测试测试测试测试</p><p>测试测试测试测试测试测试<br>测试测试测试测试</p><p>测试测试测试测试v</p><p>测试测试测试测试</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;测试测试测试测试测试测试测试测试测试测试测试测试测试测试&lt;/p&gt;
-&lt;p&gt;测试测试测试测试测试测试&lt;br&gt;测试测试测试测试&lt;/p&gt;
-&lt;p&gt;测试测试测试测试v&lt;/p&gt;
-&lt;p&gt;测试测试测试测试&lt;/p&gt;
-
-      
-    
-    </summary>
-    
-      <category term="生活" scheme="http://yzhclear.com/categories/%E7%94%9F%E6%B4%BB/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="http://yzhclear.com/2018/02/02/hello-world/"/>
-    <id>http://yzhclear.com/2018/02/02/hello-world/</id>
-    <published>2018-02-02T13:45:40.000Z</published>
-    <updated>2018-02-04T07:26:34.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>]]></content>
+    <content type="html"><![CDATA[<p>众所周知，JavaScript是一种单线程编程语言，为了能让JavaScript流畅地运行，所有的异步任务都应该被合适地处理，而事件循环(Event loop)就是JavaScript引擎处理异步任务的方式。一个运行环境有一个事件循环，而一个事件循环中可以有一个或者多个任务队列。</p><h3 id="一个例题"><a href="#一个例题" class="headerlink" title="一个例题"></a>一个例题</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">new Promise(resolve =&gt; &#123;</span><br><span class="line">  resolve(1);</span><br><span class="line">  Promise.resolve().then(() =&gt; console.log(2));</span><br><span class="line">  console.log(4);</span><br><span class="line">&#125;).then(t =&gt; console.log(t));</span><br><span class="line">console.log(3)</span><br></pre></td></tr></table></figure><p>以上代码输出结果为 ‘4 3 2 1’。接下来我们就来分析一下为什么会输出这样的结果。  </p><p>当使用new Promise( )构造器创建一个Promise对象时，提供了一个函数回调，这个函数回调是同步的或立即调用的。也就是说上述代码中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">resolve =&gt; &#123;</span><br><span class="line">  resolve(1);</span><br><span class="line">  Promise.resolve().then(() =&gt; console.log(2));</span><br><span class="line">  console.log(4);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p><p>是按照同步顺序执行的。所以首先会传出一个数值 ‘ 1 ‘ 供以后的then( ) 处理，然后返回一个最终状态由then方法执行决定的Promise对象，此时应该注意每个Promise实例的then( )和catch( )方法都是异步调用的，所以 <em>then(() =&gt; console.log(2))</em> 会被放进任务队列中等待处理。再往后，执行 console.log(4) ,所以最先会输出 ‘ 4 ‘。  </p><p>之后，执行到 <em>then(t =&gt; console.log(t))</em> ,同理把 <em>then(t =&gt; console.log(t))</em> 放进任务队列中等待处理。</p><p>最后执行 <em>console.log(3)</em> ，所以输出的第二个值是’ 3 ‘。</p><p>此时主线程中的代码已经执行完了，主线程处于空闲状态。这时候JavaScript引擎就开始处理任务队列中等待的任务。因为JavaScript的每一个任务队列中 的任务是严格按照先进先出的顺序执行的。所以先进入任务队列的 <em>then(() =&gt; console.log(2))</em> 先执行，输出 ‘ 2 ‘。</p><p>然后后进入任务队列的 <em>then(t =&gt; console.log(t)</em> 执行。因为之前的Promise对象传出了数值 ‘ 1 ‘供这个then( )方法处理，所以最后输出 ‘ 1 ‘。</p><h3 id="深入了解事件循环"><a href="#深入了解事件循环" class="headerlink" title="深入了解事件循环"></a>深入了解事件循环</h3><p>上面的例题中，事件循环只有一个任务队列，我们只需要等待主线程空闲之后，再按照先进先出的顺序执行任务队列中的任务即可。可是如果一个事件循环里有很多个来自不同任务源的任务队列，又该按照什么样的顺序来执行呢？</p><p>例如如下代码应该输出什么样的结果呢:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">setTimeout(function() &#123;</span><br><span class="line">  console.log(&apos;setTimeout1&apos;);</span><br><span class="line">    Promise.resolve().then(function() &#123;</span><br><span class="line">      console.log(&apos;promise1&apos;);</span><br><span class="line">    &#125;).then(function() &#123;</span><br><span class="line">      console.log(&apos;promise2&apos;);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;, 0);</span><br><span class="line">setTimeout(function() &#123;</span><br><span class="line">  console.log(&apos;setTimeout2&apos;);</span><br><span class="line">    Promise.resolve().then(function() &#123;</span><br><span class="line">      console.log(&apos;promise3&apos;);</span><br><span class="line">    &#125;).then(function() &#123;</span><br><span class="line">      console.log(&apos;promise4&apos;);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;, 0);</span><br></pre></td></tr></table></figure></p><p>在最新版Chrome控制台中会输出:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">setTimeout1</span><br><span class="line">promise1</span><br><span class="line">promise2</span><br><span class="line">setTimeout2</span><br><span class="line">promise3</span><br><span class="line">promise4</span><br></pre></td></tr></table></figure><p>为什么会输出这样的结果呢？先让我们来了解两个概念：macroTask和microTask。</p><p>在JavaScript中，任务被分为task(又称macrotask，宏任务)和microtask(微任务)，它们分别包含以下内容：</p><ul><li>macrotask: script(整体代码)，setTimeout,setInterval,setImmediate,I/O,UI rendering</li><li>microtask:process.nextTick,Promises,Object.observe,MutationObserver</li></ul><p>JavaScript中的回调任务都会被分配到macrotask队列和microtask队列中，那么这两个任务队列该以怎样的顺序执行呢？</p><p>具体来说，浏览器会不断从macroTask队列中按顺序取出macrotask执行，每执行完一个macrotask都会检查microtask队列是否为空(执行完一个队列的具体标志是函数执行栈为空)，如果不为空则会一次性执行完所有microtask。然后再进入下一个循环去macrotask队列中取下一个macrotask执行，以此类推。</p><p>可以参考下图来理解:<br><img src="/images/1-1.png" alt="avatar"></p><p>这样一来，上面代码打印的结果也就很容易理解了。</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
+        &lt;p&gt;众所周知，JavaScript是一种单线程编程语言，为了能让JavaScript流畅地运行，所有的异步任务都应该被合适地处理，而事件循环(Event loop)就是JavaScript引擎处理异步任务的方式。一个运行环境有一个事件循环，而一个事件循环中可以有一个或者多个任务
       
     
     </summary>
     
-      <category term="front" scheme="http://yzhclear.com/categories/front/"/>
+      <category term="JavaScript" scheme="http://yzhclear.com/categories/JavaScript/"/>
     
     
-      <category term="javascript" scheme="http://yzhclear.com/tags/javascript/"/>
+      <category term="JavaScript" scheme="http://yzhclear.com/tags/JavaScript/"/>
     
   </entry>
   
