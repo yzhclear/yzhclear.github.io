@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yzhclear.com/"/>
-  <updated>2018-04-22T16:34:09.000Z</updated>
+  <updated>2018-07-11T16:37:51.678Z</updated>
   <id>http://yzhclear.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用Vue.extend构造器出现的问题</title>
+    <link href="http://yzhclear.com/2018/07/11/post/"/>
+    <id>http://yzhclear.com/2018/07/11/post/</id>
+    <published>2018-07-11T14:52:39.000Z</published>
+    <updated>2018-07-11T16:37:51.678Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天在维护公司线上一个项目，完善一个筛选功能的时候遇到了一个问题，代码如下(代码修改了以保护公司隐私但要体现的问题是一样的)：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">for (var i = 0; i &lt; response.data; i++) &#123;</span><br><span class="line">    html += &apos;&lt;li&gt;&lt;a @click=&quot;click(\&apos;&apos;+ value +&apos;\&apos;, \&apos;&apos;+ response.data[i] +&apos;\&apos;)&quot; data-info=&apos;+ response.data[i] +&apos;&gt;&apos;+ response.data[i] +&apos;&lt;/a&gt;&lt;/li&gt;&apos;;</span><br><span class="line">&#125;</span><br><span class="line">var MyComponent = Vue.extend(&#123;</span><br><span class="line">    template: &quot;&lt;div class=&quot;+list+&quot;&gt;&quot; + html + &quot;&lt;/div&gt;&quot;,</span><br><span class="line">    methods: &#123;</span><br><span class="line">        click: function (item, id) &#123;</span><br><span class="line">            this.myFilter(item,id)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">new MyComponent().$mount(&apos;.&apos; + list)</span><br></pre></td></tr></table></figure></p><p>这段代码主要作用是通过响应得到的后端数据来动态创建一个筛选列表list。Vue.extend( )构造器的作用是创建一个子类MyComponent将筛选的列表挂载到类名为list标签上，然后通过点击这个列表的具体某子个元素触发click函数从而来触发myFilter函数来筛选数据。    </p><p>我现在需要做的是当点击这个列表子元素时实现样式的改变，也就是这个列表元素变成选中样式。   </p><p>这个效果实现起来可以说是相当简单了。于是我就开始写代码：   </p><p>给Vue实例的data属性绑定一个状态isActive，值为false，然后在click函数添加 <em>this.isActive = true</em>,再给 <em><a></a></em> 标签动态绑定一个样式 <em>:class={active: isActive}</em> 当isActive值变为true时，<em><a></a></em> 标签就绑定一个类名为active的样式(当然我已经写好了这个选中样式)。     </p><p>然后运行这个项目，点击某个列表子元素发现并没有效果，打开控制台发现样式并没有绑定到这个子元素上，查了一下官方文档关于Vue.extend的说明：</p><blockquote><blockquote><blockquote><p>使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。</p></blockquote></blockquote></blockquote><p>也就是说使用Vue.extend( )相当于创建了一个子组件。子组件当然是访问不了父组件中定义的样式了(在没有进行组件间通信的情况下)。           </p><p>所以我就直接在MyComponent这个“子类”定义绑定一个内联样式，具体实现代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">for (var i = 0; i &lt; response.data.length; i++) &#123;</span><br><span class="line">    html += &apos;&lt;li&gt;&lt;a :style=&quot;styleObject&quot; @click=&quot;click(\&apos;&apos;+ value +&apos;\&apos;, \&apos;&apos;+ response.data[i] +&apos;\&apos;)&quot; data-info=&apos;+ response.data[i] +&apos;&gt;&apos;+ response.data[i] +&apos;&lt;/a&gt;&lt;/li&gt;&apos;;</span><br><span class="line">&#125;</span><br><span class="line">var MyComponent = Vue.extend(&#123;</span><br><span class="line">    template: &quot;&lt;div class=&quot; + list + &quot;&gt;&quot; + html + &quot;&lt;/div&gt;&quot;,</span><br><span class="line">    data: function () &#123;</span><br><span class="line">      return &#123;</span><br><span class="line">        styleObject: &#123;&#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    methods: &#123;</span><br><span class="line">        click: function(item, id) &#123;</span><br><span class="line">            this.styleObject = &#123;color: &apos;#F1B9B8&apos;&#125;</span><br><span class="line">            this.myFilter(item,id)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">new MyComponent().$mount(&apos;.&apos; + list);</span><br></pre></td></tr></table></figure></p><p>最后运行项目效果如期实现。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;今天在维护公司线上一个项目，完善一个筛选功能的时候遇到了一个问题，代码如下(代码修改了以保护公司隐私但要体现的问题是一样的)：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;sp
+      
+    
+    </summary>
+    
+      <category term="Vue.js" scheme="http://yzhclear.com/categories/Vue-js/"/>
+    
+    
+      <category term="Vue.js" scheme="http://yzhclear.com/tags/Vue-js/"/>
+    
+  </entry>
   
   <entry>
     <title>从Promise中看JavaScript事件循环</title>
